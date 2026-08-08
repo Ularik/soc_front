@@ -15,3 +15,12 @@ export const DETECTION_TOOLS = [
   "EDR",
   "SIEM",
 ];
+
+export const ORIGIN_NAMES = [
+  "FINACE",
+  "GTS",
+  "Tax",
+  "President ADM",
+  "MID",
+  "INFOCOM",
+];

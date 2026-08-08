@@ -19,7 +19,9 @@ import {
   inputClass,
   RISK_LEVELS,
   DETECTION_TOOLS,
+  ORIGIN_NAMES,
 } from "@/constants/constants";
+import { useOrganizations, useOrganizations } from "@/requests/queries";
 import type { ReportType } from "@/types/reports";
 
 interface Props {
@@ -35,6 +37,9 @@ export default function ReportForm({
   isLoading,
   submitFunc,
 }: Props) {
+
+  const {data: organizations, isPending, error: orgError } = useOrganizations();
+
   const {
     register,
     handleSubmit,
@@ -42,22 +47,32 @@ export default function ReportForm({
     setError,
     formState: { errors },
   } = useForm<ReportType>({
-    defaultValues: initialValue || {
-      detection_date: "",
-      attack_type: "",
-      source_ip: "",
-      destination_ip: "",
-      host: "",
-      cve: "",
-      detection_tool: "",
-      short_description: "",
-      methods: "",
-      protocols_ports: "",
-      risk_assessment: "",
-      potential_impact: "",
-      data_or_payload: "",
-      response_actions: "",
-    },
+    values: initialValue
+      ? {
+          ...initialValue,
+          origin_name:
+            organizations?.find((name) =>
+              initialValue.origin_name.includes(name),
+            ) || "",
+        }
+      : {
+          country: "",
+          detection_date: "",
+          origin_name: "",
+          attack_type: "",
+          source_ip: "",
+          destination_ip: "",
+          host: "",
+          cve: "",
+          detection_tool: "",
+          short_description: "",
+          methods: "",
+          protocols_ports: "",
+          risk_assessment: "",
+          potential_impact: "",
+          data_or_payload: "",
+          response_actions: "",
+        },
   });
 
   const onSubmit = (data: ReportType) => {
@@ -97,6 +112,22 @@ export default function ReportForm({
 
       {/* Метаданные (2 колонки) */}
       <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
+            Страна (Country)
+          </label>
+          <Input
+            {...register("country")}
+            placeholder="US"
+            className={`${inputClass} ${errors.country ? "border-red-500 focus-visible:ring-red-500" : ""}`}
+            disabled={isLoading}
+          />
+          {errors.country && (
+            <p className="pt-0.5 text-xs font-semibold text-red-500">
+              {errors.country.message}
+            </p>
+          )}
+        </div>
         {/* Дата обнаружения */}
         <div className="space-y-1">
           <label className="text-sm font-medium text-gray-700">
@@ -113,6 +144,40 @@ export default function ReportForm({
           {errors.detection_date && (
             <p className="pt-0.5 text-xs font-semibold text-red-500">
               {errors.detection_date.message}
+            </p>
+          )}
+        </div>
+
+        <div className="space-y-1">
+          <label className="text-sm font-medium text-gray-700">
+            Организация (Ведомство)
+          </label>
+          <Controller
+            control={control}
+            name="origin_name"
+            render={({ field }) => (
+              <Select
+                onValueChange={field.onChange}
+                value={field.value || undefined}
+              >
+                <SelectTrigger
+                  className={`${inputClass} ${errors.origin_name ? "border-red-500" : ""}`}
+                >
+                  <SelectValue placeholder="Выберите средство (WAF / IPS)" />
+                </SelectTrigger>
+                <SelectContent>
+                  {ORIGIN_NAMES?.map((title) => (
+                    <SelectItem key={title} value={title}>
+                      {title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            )}
+          />
+          {errors.origin_name && (
+            <p className="pt-0.5 text-xs font-semibold text-red-500">
+              {errors.origin_name.message}
             </p>
           )}
         </div>

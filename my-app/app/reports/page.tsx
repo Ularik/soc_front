@@ -6,8 +6,9 @@ import { Loader2 } from "lucide-react";
 import ReportForm from "@/components/reports/ReportForm";
 import { ReportType } from "@/types/reports";
 import { Textarea } from "@/components/ui/textarea";
-import { useAiReportResponse } from "@/requests/queries";
+import { useAiReportResponse, useCreateReport } from "@/requests/queries";
 import { Button } from "@/components/ui/button";
+import { toast } from "sonner";
 
 export default function ReportCreate() {
   const [text, setText] = useState("");
@@ -41,8 +42,18 @@ export default function ReportCreate() {
     });
   };
 
+
+  const { mutate: postRep, isPending: isLoading, error: createError } = useCreateReport();
   const submit = (data: ReportType) => {
     console.log("Сохраняем отчет:", data);
+    postRep(data, {
+      onSuccess: () => {
+        toast.success("Создали отчет в базе", { position: "top-center"})
+      },
+      onError: () => {
+        toast.error("Не удалось создать отчет", {position: "top-center"})
+      }
+    });
   };
 
   return (
@@ -86,8 +97,8 @@ export default function ReportCreate() {
       <ReportForm
         key={report ? JSON.stringify(report) : "empty-report-form"}
         initialValue={report}
-        isLoading={isPending}
-        error={error}
+        isLoading={isPending || isLoading}
+        error={createError}
         submitFunc={submit}
       />
     </div>

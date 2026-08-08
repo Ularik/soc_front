@@ -1,8 +1,20 @@
 import axiosApi from "@/axiosApi";
-import { ApiReportResponse } from "@/types/reports";
+import { ApiReportResponse, ReportType } from "@/types/reports";
 
 
 export const getAiAnswer = async (text: string): Promise<ApiReportResponse> => {
-    const res = await axiosApi.post("/get-ai-answer/", {body: text});
+    const data = { body: text };
+    const res = await axiosApi.post("/get-ai-answer/", data);
+    return res.data;
+}
+
+export const postReport = async (data: ReportType) => {
+  const res = await axiosApi.post("/create-report/", data);
+  return res.data;
+};
+
+
+export const getOrganizations = async () => {
+    const res = await axiosApi.get("/get-organizations/");
     return res.data;
 }

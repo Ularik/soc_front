@@ -1,5 +1,7 @@
 export interface ReportType {
+  country: string;
   detection_date: string;
+  origin_name: string;
   attack_type: string;
   source_ip: string;
   destination_ip: string;

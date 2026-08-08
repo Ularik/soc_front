@@ -4,6 +4,7 @@ import "./globals.css";
 import Providers from "@/providers/providers";
 import { cn } from "@/lib/utils";
 import Header from "@/components/header/Header";
+import { Toaster } from "@/components/ui/toast";
 
 
 const inter = Inter({subsets:['latin'],variable:'--font-sans'});
@@ -28,6 +29,7 @@ export default function RootLayout({
     <html className={cn("h-full", "antialiased", montserrat.variable, "font-sans", inter.variable)}>
       <body className="">
         <Header/>
+        <Toaster/>
         <Providers>{children}</Providers>
       </body>
     </html>
