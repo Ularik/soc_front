@@ -21,7 +21,7 @@ import {
   DETECTION_TOOLS,
   ORIGIN_NAMES,
 } from "@/constants/constants";
-import { useOrganizations, useOrganizations } from "@/requests/queries";
+import { useOrganizations } from "@/requests/queries";
 import type { ReportType } from "@/types/reports";
 
 interface Props {
@@ -39,6 +39,7 @@ export default function ReportForm({
 }: Props) {
 
   const {data: organizations, isPending, error: orgError } = useOrganizations();
+  const ORGANIZATIONS_TITLE = organizations?.map((org) => org.name_en);
 
   const {
     register,
@@ -51,9 +52,10 @@ export default function ReportForm({
       ? {
           ...initialValue,
           origin_name:
-            organizations?.find((name) =>
-              initialValue.origin_name.includes(name),
+            ORGANIZATIONS_TITLE?.find((title) =>
+              initialValue.origin_name.includes(title),
             ) || "",
+
         }
       : {
           country: "",
@@ -166,9 +168,9 @@ export default function ReportForm({
                   <SelectValue placeholder="Выберите средство (WAF / IPS)" />
                 </SelectTrigger>
                 <SelectContent>
-                  {ORIGIN_NAMES?.map((title) => (
-                    <SelectItem key={title} value={title}>
-                      {title}
+                  {organizations?.map((org) => (
+                    <SelectItem key={org.id} value={org.name_en}>
+                      {org.name_en} / {org.name_ru}
                     </SelectItem>
                   ))}
                 </SelectContent>
