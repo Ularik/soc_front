@@ -10,7 +10,7 @@ export default function Header() {
 
         <nav className="flex items-center gap-6 text-sm font-medium">
           <Link
-            href="/reports"
+            href="/reports/create"
             className="text-muted-foreground transition-colors hover:text-foreground"
           >
             Создать отчет

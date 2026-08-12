@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { Loader2 } from "lucide-react";
-
+import { AxiosError } from "axios";
+import type { ApiErrorResponse } from "@/types/errors";
 import ReportForm from "@/components/reports/ReportForm";
 import { ReportType } from "@/types/reports";
 import { Textarea } from "@/components/ui/textarea";
@@ -45,13 +46,21 @@ export default function ReportCreate() {
 
   const { mutate: postRep, isPending: isLoading, error: createError } = useCreateReport();
   const submit = (data: ReportType) => {
-    console.log("Сохраняем отчет:", data);
+
     postRep(data, {
       onSuccess: () => {
         toast.success("Создали отчет в базе", { position: "top-center"})
       },
-      onError: () => {
-        toast.error("Не удалось создать отчет", {position: "top-center"})
+      onError: (err) => {
+        const axiosError = err as AxiosError<ApiErrorResponse>;
+
+        // Достаем detail из ответа бэкенда или пишем дефолтный текст
+        const errorMessage =
+          axiosError.response?.data?.detail || "Не удалось создать отчет";
+
+        toast.error(errorMessage, {
+          position: "top-center",
+        });
       }
     });
   };
