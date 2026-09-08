@@ -1,5 +1,5 @@
 import { useQuery, useMutation } from "@tanstack/react-query";
-import { getAiAnswer, postReport, getOrganizations } from "./axiosRequests";
+import { getAiAnswer, postReport, getOrganizations } from "@/lib/services/reports";
 
 export function useAiReportResponse() {
   return useMutation({
@@ -15,7 +15,6 @@ export function useCreateReport() {
   });
 }
 
-
 export function useOrganizations() {
   return useQuery({
     queryKey: ["organizations"],
@@ -24,6 +23,6 @@ export function useOrganizations() {
     staleTime: 1000 * 60, // 1 мин
 
     // Данные хранятся в кэше памяти 1 часа после того, как компонент размонтирован
-    gcTime: 1000 * 60 * 60 , // 1 часа (в React Query v4 и ниже используйте cacheTime)
+    gcTime: 1000 * 60 * 60, // 1 часа (в React Query v4 и ниже используйте cacheTime)
   });
 }

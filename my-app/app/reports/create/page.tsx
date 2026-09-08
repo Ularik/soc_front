@@ -7,7 +7,7 @@ import type { ApiErrorResponse } from "@/types/errors";
 import ReportForm from "@/components/reports/ReportForm";
 import { ReportType } from "@/types/reports";
 import { Textarea } from "@/components/ui/textarea";
-import { useAiReportResponse, useCreateReport } from "@/requests/queries";
+import { useAiReportResponse, useCreateReport } from "@/lib/hooks/reports";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 

@@ -1,4 +1,4 @@
-import axiosApi from "@/axiosApi";
+import axiosApi from "@/constants/axiosApi";
 import type { IUser, UserLoginMutation, LoginResponse } from "@/types/user";
 
 export const getMe = async () => {
@@ -7,7 +7,9 @@ export const getMe = async () => {
   return res.data;
 };
 
-export const login = async (data: UserLoginMutation): Promise<LoginResponse> => {
+export const login = async (
+  data: UserLoginMutation,
+): Promise<LoginResponse> => {
   const res = await axiosApi.post<LoginResponse>("/users/login", data);
 
   return res.data;

@@ -21,7 +21,7 @@ import {
   DETECTION_TOOLS,
   ORIGIN_NAMES,
 } from "@/constants/constants";
-import { useOrganizations } from "@/requests/queries";
+import { useOrganizations } from "@/lib/hooks/reports";
 import type { ReportType } from "@/types/reports";
 
 interface Props {

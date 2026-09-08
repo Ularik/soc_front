@@ -1,9 +1,8 @@
 "use client";
 
-import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
-import { z } from "zod";
-
+import { useRouter } from "next/navigation";
+import type { UserLoginMutation } from "@/types/user";
 import { Button } from "@/components/ui/button";
 import {
   Card,
@@ -12,40 +11,29 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
-import {
-  Form,
-  FormControl,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form";
-import { Input } from "@/components/ui/input";
-
-// Схема валидации Zod
-const loginSchema = z.object({
-  username: z.string().min(2, {
-    message: "Имя пользователя должно быть не менее 2 символов",
-  }),
-  password: z.string().min(6, {
-    message: "Пароль должен быть не менее 6 символов",
-  }),
-});
-
-type LoginValues = z.infer<typeof loginSchema>;
+import { useLogin } from "@/lib/hooks/authHooks";
 
 export default function LoginPage() {
-  const form = useForm<LoginValues>({
-    resolver: zodResolver(loginSchema),
+  const router = useRouter();
+  const { mutate: login, isPending, error: apiError } = useLogin();
+
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<UserLoginMutation>({
     defaultValues: {
       username: "",
       password: "",
     },
   });
 
-  function onSubmit(values: LoginValues) {
-    // Здесь отправка запроса на ваш бэкенд (FastAPI / NextAuth / API Route)
-    console.log("Данные формы:", values);
+  function onSubmit(values: UserLoginMutation) {
+    login(values, {
+      onSuccess: () => {
+        router.push("/reports/create")
+      }
+    });
   }
 
   return (
@@ -58,49 +46,63 @@ export default function LoginPage() {
           </CardDescription>
         </CardHeader>
         <CardContent>
-          <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
-              <FormField
-                control={form.control}
-                name="username"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Username</FormLabel>
-                    <FormControl>
-                      <Input placeholder="johndoe" {...field} />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+          <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+            {/* Ошибка авторизации от сервера (например, "Неверный логин или пароль") */}
+            {apiError && (
+              <div className="p-3 text-sm rounded-md bg-destructive/15 text-destructive font-medium">
+                {apiError.message || "Ошибка входа в систему"}
+              </div>
+            )}
 
-              <FormField
-                control={form.control}
-                name="password"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Пароль</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="password"
-                        placeholder="••••••••"
-                        {...field}
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
+            <div className="space-y-1">
+              <label htmlFor="username" className="text-sm font-medium">
+                Username
+              </label>
+              <input
+                id="username"
+                placeholder="johndoe"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
+                disabled={isPending}
+                {...register("username", {
+                  required: "Введите имя пользователя",
+                })}
               />
+              {errors.username && (
+                <p className="text-sm font-medium text-destructive">
+                  {errors.username.message}
+                </p>
+              )}
+            </div>
 
-              <Button
-                type="submit"
-                className="w-full"
-                disabled={form.formState.isSubmitting}
-              >
-                {form.formState.isSubmitting ? "Вход..." : "Войти"}
-              </Button>
-            </form>
-          </Form>
+            <div className="space-y-1">
+              <label htmlFor="password" className="text-sm font-medium">
+                Пароль
+              </label>
+              <input
+                id="password"
+                type="password"
+                placeholder="••••••••"
+                className="border-input bg-background ring-offset-background placeholder:text-muted-foreground focus-visible:ring-ring flex h-10 w-full rounded-md border px-3 py-2 text-sm focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:outline-none disabled:opacity-50"
+                disabled={isPending}
+                {...register("password", {
+                  required: "Введите пароль",
+                  minLength: {
+                    value: 4,
+                    message: "Пароль должен содержать минимум 4 символа",
+                  },
+                })}
+              />
+              {errors.password && (
+                <p className="text-sm font-medium text-destructive">
+                  {errors.password.message}
+                </p>
+              )}
+            </div>
+
+            <Button type="submit" className="w-full" disabled={isPending}>
+              {isPending ? "Вход..." : "Войти"}
+            </Button>
+          </form>
         </CardContent>
       </Card>
     </div>
